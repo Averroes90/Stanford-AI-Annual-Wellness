@@ -1,4 +1,5 @@
 # Medicare Annual Wellness Visit Voice Agent
+
 ## Hippocratic AI - TPM Take-Home Project
 
 **Candidate:** Rami Ibrahimi  
@@ -29,6 +30,7 @@ A voice AI agent that conducts Medicare Annual Wellness Visit (AWV) health risk 
 ## What's Working Now
 
 ### Core Conversation Flow
+
 - [x] Greeting and identity confirmation
 - [x] 8 representative questions from Stanford AWV form
 - [x] Brief acknowledgments between questions
@@ -49,11 +51,13 @@ A voice AI agent that conducts Medicare Annual Wellness Visit (AWV) health risk 
 | 8 | Advance directive on file | Yes/No/Unsure | No |
 
 ### Escalation Protocols
+
 - [x] Depression screening (PHQ-2 positive → safety follow-up question)
 - [x] Falls with injury → flagged for care team
 - [ ] Home safety concerns → flagged for care team
 
 ### Conversation Handling
+
 - [x] Vague answers → one clarifying question, then accept
 - [x] "I don't know" → acknowledge and move on
 - [x] Off-topic responses → acknowledge, note for provider, redirect
@@ -65,12 +69,14 @@ A voice AI agent that conducts Medicare Annual Wellness Visit (AWV) health risk 
 ## Technical Implementation
 
 ### Platform
+
 - **Voice AI:** Vapi
 - **LLM:** Claude Sonnet / GPT-4o (configurable)
 - **Speech-to-Text:** Vapi default (Deepgram)
 - **Text-to-Speech:** Vapi default
 
 ### Configuration
+
 | Setting | Value | Rationale |
 |---------|-------|-----------|
 | Temperature | 0.4 | Consistency over creativity |
@@ -78,9 +84,11 @@ A voice AI agent that conducts Medicare Annual Wellness Visit (AWV) health risk 
 | End of Turn Timeout | 1.5s | Balance: don't cut off, don't lag |
 
 ### System Prompt
+>
 > Located in: `prompts/system_prompt.md`
 
 Key sections:
+
 - Opening script
 - Question sequence
 - Escalation protocols
@@ -89,6 +97,82 @@ Key sections:
 - State tracking guidance
 
 ---
+
+## Production Architecture Considerations
+
+### Current Prototype Approach
+
+The system prompt (~2000 tokens) is sent with every conversational turn, along with growing conversation history. By question 8, each turn sends ~3500+ tokens. For a prototype, this is acceptable.
+
+### Why This Doesn't Scale
+
+| Metric | 8-Question Call | At 1M Calls/Month |
+|--------|-----------------|-------------------|
+| Tokens per call | ~25,000 | 25 billion |
+| Estimated cost (GPT-4o) | ~$0.15 | ~$150,000 |
+| Estimated cost (Haiku) | ~$0.02 | ~$20,000 |
+
+Latency also increases as context grows - directly impacting the emotional connection Hippocratic emphasizes.
+
+### Production Alternative: State Machine + Minimal Prompt
+
+```
+┌─────────────────────────────────────────────────┐
+│  Backend State Manager                          │
+│  - Tracks current question                      │
+│  - Manages branching logic (falls → count)      │
+│  - Validates responses                          │
+│  - Triggers escalations                         │
+└─────────────────────────────────────────────────┘
+                      │
+          Injects: {{currentQuestion}}
+          Injects: {{validResponses}}
+                      │
+                      ▼
+┌─────────────────────────────────────────────────┐
+│  Minimal LLM Prompt (~500 tokens)               │
+│  - Role and tone                                │
+│  - Current question only                        │
+│  - Escalation rules                             │
+│  - Parse response + acknowledge + ask next      │
+└─────────────────────────────────────────────────┘
+```
+
+**Benefits:**
+
+- 60-70% reduction in tokens per call
+- Consistent latency (context doesn't grow)
+- Deterministic state management
+- Easier to test and debug branching logic
+
+### Minimal Prompt Template (Example)
+
+```
+You are a healthcare assistant for Stanford Medicine Partners.
+Tone: Warm, patient, professional.
+
+CURRENT QUESTION: {{currentQuestion}}
+VALID RESPONSES: {{validResponses}}
+FOLLOW-UP IF NEEDED: {{followUpRule}}
+
+RULES:
+- Acknowledge briefly, then ask the question naturally
+- One clarifying question max, then accept the response
+- Never give medical advice
+- Safety concerns → "I'll make sure your care team follows up"
+
+Parse the patient's response and proceed.
+```
+
+### Implementation Options
+
+| Approach | Complexity | Token Savings | Notes |
+|----------|------------|---------------|-------|
+| Vapi dynamic variables | Low | 40-50% | Use `{{variables}}` in prompt |
+| Vapi function calling | Medium | 60-70% | Backend returns next question |
+| Custom voice pipeline | High | 70-80% | Full control, more engineering |
+
+For this project, I implemented the full-prompt approach for simplicity. The above architecture would be my recommendation for production deployment.
 
 ## Planned Enhancements
 
@@ -224,16 +308,19 @@ Key sections:
 ### Why These Numbers
 
 **Form field accuracy (95%):**  
+
 - The receiving clinician needs to trust the data
 - 5% error rate = ~1 wrong answer per 20-question form
 - Higher threshold ideal but may require human review for edge cases
 
 **Escalation recall (99%):**  
+
 - Patient safety is non-negotiable
 - Missing a depression or safety flag could lead to harm
 - This is Hippocratic's core value proposition: "safety-focused"
 
 **Escalation precision (80%):**  
+
 - False positives = unnecessary human review (cost, not harm)
 - Acceptable tradeoff: better to over-flag than under-flag
 - 20% false positive means 1 in 5 escalations are unnecessary

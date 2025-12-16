@@ -35,7 +35,7 @@ A voice AI agent that conducts Medicare Annual Wellness Visit (AWV) health risk 
 - [x] 8 representative questions from Stanford AWV form
 - [x] Brief acknowledgments between questions
 - [x] Closing with open-ended "anything else" prompt
-- [ ] Structured data extraction at end of call
+- [x] Structured data extraction at end of call
 
 ### Questions Implemented
 
@@ -54,15 +54,15 @@ A voice AI agent that conducts Medicare Annual Wellness Visit (AWV) health risk 
 
 - [x] Depression screening (PHQ-2 positive → safety follow-up question)
 - [x] Falls with injury → flagged for care team
-- [ ] Home safety concerns → flagged for care team
+- [x] Home safety concerns → flagged for care team
 
 ### Conversation Handling
 
 - [x] Vague answers → one clarifying question, then accept
 - [x] "I don't know" → acknowledge and move on
 - [x] Off-topic responses → acknowledge, note for provider, redirect
-- [ ] Interruption handling → confirm answer matches question
-- [ ] Follow-up limits → max 1 per topic, no symptom exploration
+- [x] Interruption handling → confirm answer matches question
+- [x] Follow-up limits → max 1 per topic, no symptom exploration
 
 ---
 
@@ -176,17 +176,18 @@ For this project, I implemented the full-prompt approach for simplicity. The abo
 
 ## Planned Enhancements
 
-### High Priority (Before Submission)
+### Completed (Before Submission)
 
-| Enhancement | Status | Effort | Impact |
-|-------------|--------|--------|--------|
-| Add interruption handling to prompt | 🔲 Todo | 15 min | Handles edge case from testing |
-| Add follow-up limits to prompt | 🔲 Todo | 10 min | Prevents infinite loops |
-| Add scope boundaries to prompt | 🔲 Todo | 10 min | Aligns with Hippocratic's non-diagnostic model |
-| Configure Summary Prompt for structured output | 🔲 Todo | 15 min | Concrete artifact to show |
-| Configure Success Evaluation | 🔲 Todo | 10 min | Auto-generates eval metrics |
-| Test depression escalation path | 🔲 Todo | 15 min | Critical safety feature |
-| Test falls with injury path | 🔲 Todo | 10 min | Secondary escalation |
+| Enhancement | Notes |
+|-------------|-------|
+| Interruption handling in prompt | Confirms answer matches question before recording |
+| Follow-up limits in prompt | Max 1 clarification per topic, no symptom exploration |
+| Scope boundaries in prompt | Aligns with Hippocratic's non-diagnostic model |
+| Summary Prompt configured | Structured data extraction post-call |
+| Success Evaluation configured | Auto-scores completion, quality, escalation handling |
+| Depression escalation path tested | ✓ Safety follow-up triggers correctly |
+| Falls with injury path tested | ✓ Flags for care team |
+| Declined call handling | Returns "deferred" not "fail" |
 
 ### Medium Priority (Time Permitting)
 

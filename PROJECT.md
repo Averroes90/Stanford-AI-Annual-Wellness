@@ -174,32 +174,7 @@ Parse the patient's response and proceed.
 
 For this project, I implemented the full-prompt approach for simplicity. The above architecture would be my recommendation for production deployment.
 
-## Planned Enhancements
-
-### Completed (Before Submission)
-
-| Enhancement | Notes |
-|-------------|-------|
-| Interruption handling in prompt | Confirms answer matches question before recording |
-| Follow-up limits in prompt | Max 1 clarification per topic, no symptom exploration |
-| Scope boundaries in prompt | Aligns with Hippocratic's non-diagnostic model |
-| Summary Prompt configured | Structured data extraction post-call |
-| Success Evaluation configured | Auto-scores completion, quality, escalation handling |
-| Depression escalation path tested | ✓ Safety follow-up triggers correctly |
-| Falls with injury path tested | ✓ Flags for care team |
-| Declined call handling | Returns "deferred" not "fail" |
-
-### Medium Priority (Time Permitting)
-
-| Enhancement | Status | Effort | Impact |
-|-------------|--------|--------|--------|
-| Simple API wrapper script | 🔲 Todo | 30 min | Shows programmatic understanding |
-| Add state tracking to prompt | 🔲 Todo | 20 min | More deterministic flow |
-| Tune turn-taking settings | 🔲 Todo | 15 min | Better interruption handling |
-| Test 3+ challenging scenarios | 🔲 Todo | 45 min | Strengthens eval discussion |
-| Document test results with metrics | 🔲 Todo | 30 min | Concrete data for Part 2 |
-
-### Future / Production Considerations
+## Future / Production Considerations
 
 | Enhancement | Notes |
 |-------------|-------|
@@ -411,13 +386,13 @@ For this project, I implemented the full-prompt approach for simplicity. The abo
 
 | Date | Change | Status |
 |------|--------|--------|
-| Dec 12, 2024 | Initial skeleton created | Current |
-| | Added interruption handling to prompt | 🔲 |
-| | Added follow-up limits to prompt | 🔲 |
-| | Configured Summary Prompt | 🔲 |
-| | Tested depression escalation | 🔲 |
+| Dec 12, 2025 | Initial skeleton created | Current |
+| Dec 13, 2025 | Added interruption handling to prompt | 🔲 |
+| Dec 13, 2025 | Added follow-up limits to prompt | 🔲 |
+| Dec 13, 2025 | Configured Summary Prompt | 🔲 |
+| Dec 13, 2025| Tested depression escalation | 🔲 |
 | | ... | |
 
 ---
 
-*Last updated: December 12, 2024*
+*Last updated: December 17, 2025*
